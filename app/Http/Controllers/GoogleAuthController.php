@@ -96,7 +96,7 @@ class GoogleAuthController extends Controller
      */
     public function listContacts()
     {
-        $contacts = Contact::all();
+        $contacts = Contact::orderBy('name', 'asc')->paginate(100); 
         return view('contacts.index', compact('contacts'));
     }
 }
