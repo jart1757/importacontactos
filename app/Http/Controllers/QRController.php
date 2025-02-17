@@ -10,7 +10,7 @@ class QRController extends Controller
     public function generateQR()
     {
            // Cambia el enlace a la URL pública de Ngrok
-           $link = 'https://b760-131-0-197-253.ngrok-free.app/auth/google'; // Tu URL de Ngrok
+           $link = 'https://8f40-131-0-197-253.ngrok-free.app/auth/google'; // Tu URL de Ngrok
 
         $qr = QrCode::size(200)->generate($link);
 

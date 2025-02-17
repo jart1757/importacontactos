@@ -7,6 +7,8 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\Contact;
 use Google\Client;
 use Google\Service\PeopleService;
+use App\Models\Guest;
+
 
 class GoogleAuthController extends Controller
 {
@@ -96,7 +98,41 @@ class GoogleAuthController extends Controller
      */
     public function listContacts()
     {
-        $contacts = Contact::orderBy('name', 'asc')->paginate(100); 
+        $contacts = Contact::orderBy('name', 'asc')->paginate(900); 
         return view('contacts.index', compact('contacts'));
+    }
+    public function sendSelectedContacts(Request $request)
+    {
+         $selectedIds = $request->input('selected_contacts', []);
+    
+        // Obtener los contactos seleccionados
+        $selectedContacts = Contact::whereIn('id', $selectedIds)->get();
+
+         // Redirigir a la vista donde se mostrarán los contactos seleccionados
+        return view('contacts.selected', compact('selectedContacts'));
+    }
+    
+    public function storeFinalContacts(Request $request)
+    {
+        $contactsData = $request->input('contacts', []);
+        
+        // Eliminar todos los datos anteriores de la tabla guests
+        Guest::truncate();
+
+        foreach ($contactsData as $id => $data) {
+            Guest::updateOrCreate(
+                ['phone' => $data['phone']], // Evita duplicados
+                ['name' => $data['name']]
+            );
+        }
+
+        return redirect()->route('contacts.final.list')->with('success', 'Lista de invitados finalizada.');
+    }
+
+    // Muestra la lista final de invitados
+    public function finalList()
+    {
+        $guests = Guest::orderBy('name', 'asc')->get();
+        return view('contacts.final-list', compact('guests'));
     }
 }
